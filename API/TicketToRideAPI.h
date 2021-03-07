@@ -195,49 +195,18 @@ int getMap(int* tracks, t_color faceUp[5], t_color cards[4]);
  */
 t_return_code getMove(t_move* move, int* replay);
 
-
-/* play the move "claim a route"
- * between two cities, using a color (it should correspond to a track between the two cities)
- * and a certain number of Locomotives
+/* ------------------
+ * play a move
+ *
+ * (depending of its type, it could be a "claim route" move, "draw a card", "draw a blind card",
+ * "draw objectives" or "choose objectives")
+ *
+ * Parameter:
+ * - move: the `t_move` to play
  *
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  */
-t_return_code claimRoute(int city1, int city2, int color, int nbLocomotives);
-
-
-/* play the move "draw a blind card"
- * the drawn card is put in card
- *
- * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
- */
-t_return_code drawBlindCard(t_color* card);
-
-
-/* play the move "draw a card in the deck"
- * - card: color of the card chosen in the deck (it MUST exist)
- * - deck: array representing the deck (modified by the function)
- *
- * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
- */
-t_return_code drawCard(t_color card, t_color deck[5]);
-
-
-/* play the move "draw some objective cards"
- * - obj: array representing the objective card (modified by the function)
- *
- * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
- * -> the move "choose objectives" MUST be play just after !!
- */
-t_return_code drawObjectives(t_objective obj[3]);
-
-/* play the move "choose some objective cards"
- * - objectivesCards: array of boolean indicating which cards are taken
- * 		(0 -> the objective card is not taken)
- *
- * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
- * -> MUST be played after "draw objectives
- */
-t_return_code chooseObjectives(int objectiveCards[3]);
+t_return_code playMove(t_move* move);
 
 /* ----------------------
  * Display the Game

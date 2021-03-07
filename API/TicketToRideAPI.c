@@ -249,9 +249,15 @@ t_return_code getMove(t_move* move, int* replay)
 	return ret;
 }
 
+/* --------------------
+ Play a move
+ */
+
 /* play the move "claim a route"
  * between two cities, using a color (it should correspond to a track between the two cities)
  * and a certain number of Locomotives
+ *
+ * do not call it, called by `playMove`
  *
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  */
@@ -264,6 +270,8 @@ t_return_code claimRoute(int city1, int city2, int color, int nbLocomotives){
 
 /* play the move "draw a blind card"
  * the drawn card is put in card
+ *
+ * do not call it, called by `playMove`
  *
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  */
@@ -282,6 +290,8 @@ t_return_code drawBlindCard(t_color* card){
 /* play the move "draw a card in the deck"
  * - card: color of the card chosen in the deck (it MUST exist)
  * - deck: array representing the deck (modified by the function)
+ *
+ * do not call it, called by `playMove`
  *
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  */
@@ -302,6 +312,8 @@ t_return_code drawCard(t_color card, t_color deck[5]){
 /* play the move "draw some objective cards"
  * - obj: array representing the objective card (modified by the function)
  *
+ *
+ * do not call it, called by `playMove`
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  * -> the move "choose objectives" MUST be play just after !!
  */
@@ -327,6 +339,8 @@ t_return_code drawObjectives(t_objective obj[3]){
  * - objectivesCards: array of boolean indicating which cards are taken
  * 		(0 -> the objective card is not taken)
  *
+ * do not call it, called by `playMove`
+ *
  * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
  * -> MUST be played after "draw objectives
  */
@@ -337,6 +351,38 @@ t_return_code chooseObjectives(int objectiveCards[3]){
 	sprintf(msg, "5 %d %d %d", objectiveCards[0], objectiveCards[1], objectiveCards[2]);
 	t_return_code ret = sendCGSMove(__FUNCTION__, msg, answer);
 
+	return ret;
+}
+
+
+/* play a move (depending of its type, it could be a "claim route" move, "draw a card", "draw a blind card",
+ * "draw objectives" or "choose objectives")
+ *
+ * Parameter:
+ * - move: the `t_move` to play
+ *
+ * Returns a return_code (0 for normal move, 1 for a winning move, -1 for a losing (or illegal) move
+ */
+t_return_code playMove(t_move* move){
+	t_return_code ret;
+
+	switch (move->type) {
+		case CLAIM_ROUTE:
+			ret = claimRoute(move->claimRoute.city1, move->claimRoute.city2, move->claimRoute.color, move->claimRoute.nbLocomotives);
+			break;
+		case DRAW_CARD:
+			ret = drawCard(move->drawCard.card, move->drawCard.faceUp);
+			break;
+		case DRAW_BLIND_CARD:
+			ret = drawBlindCard(&move->drawBlindCard.card);
+			break;
+		case DRAW_OBJECTIVES:
+			ret = drawObjectives(move->drawObjectives.objectives);
+			break;
+		case CHOOSE_OBJECTIVES:
+			ret = chooseObjectives(move->chooseObjectives.chosen);
+			break;
+	}
 	return ret;
 }
 
